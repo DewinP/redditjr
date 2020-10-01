@@ -9,12 +9,13 @@ import {
   Query,
   Resolver,
 } from "type-graphql";
-import { MyContext } from "../types";
+
 import argon2 from "argon2";
 import { validateRegister } from "../utils/validateRegister";
 import { COOKIE_NAME, FORGOT_PASSOWORD_PREFIX } from "../constants";
 import { sendEmail } from "../utils/sendEmail";
 import { v4 } from "uuid";
+import { MyContext } from "src/types";
 
 @InputType()
 class UsernamePasswordInput {
@@ -51,7 +52,7 @@ export class UserResolver {
   async changePassword(
     @Arg("token") token: string,
     @Arg("newPassword") newPassword: string,
-    @Ctx() { redis, em, req }: MyContext
+    @Ctx() { redis, req }: MyContext
   ): Promise<UserResponse> {
     if (newPassword.length <= 3) {
       return {
@@ -79,7 +80,9 @@ export class UserResolver {
       };
     }
 
-    let user = await em.findOne(User, { id: parseInt(userId) });
+    const userIdNum = parseInt(userId);
+    const user = await User.findOne(userIdNum);
+
     if (!user) {
       return {
         errors: [
@@ -91,13 +94,16 @@ export class UserResolver {
       };
     }
 
-    user.password = await argon2.hash(newPassword);
-    em.persistAndFlush(user);
-
     redis.del(key);
-
     //log in user after updated password
     req.session.userId = user.id;
+
+    await User.update(
+      { id: userIdNum },
+      {
+        password: await argon2.hash(newPassword),
+      }
+    );
 
     return { user };
   }
@@ -105,17 +111,15 @@ export class UserResolver {
   @Mutation(() => Boolean)
   async forgotPassword(
     @Arg("email") email: string,
-    @Ctx() { redis, em }: MyContext
+    @Ctx() { redis }: MyContext
   ) {
-    const user = await em.findOne(User, { email });
+    const user = await User.findOne({ where: { email } });
     if (!user) {
       //email is not in the DB, return true for security.
       return true;
     }
 
     const token = v4(); //random string
-
-    console.log(token);
 
     await redis.set(
       FORGOT_PASSOWORD_PREFIX + token,
@@ -134,20 +138,19 @@ export class UserResolver {
 
   //Me query to see if user is logged in
   @Query(() => User, { nullable: true })
-  async me(@Ctx() { req, em }: MyContext) {
+  me(@Ctx() { req }: MyContext) {
     //user is not logged in
     if (!req.session.userId) {
       return null;
     }
-    const user = await em.findOne(User, { id: req.session.userId });
-    return user;
+    return User.findOne({ id: req.session.userId });
   }
 
-  //Register Mutation to create new users
+  // Register Mutation to create new users
   @Mutation(() => UserResponse)
   async register(
     @Arg("options") options: UsernamePasswordInput,
-    @Ctx() { em }: MyContext
+    @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
     const errors = validateRegister(options);
 
@@ -156,15 +159,15 @@ export class UserResolver {
     }
 
     const hashedPassword = await argon2.hash(options.password);
-
-    const user = em.create(User, {
-      username: options.username,
-      email: options.email,
-      password: hashedPassword,
-    });
-
+    let user;
     try {
-      await em.persistAndFlush(user);
+      user = await User.create({
+        username: options.username,
+        email: options.email,
+        password: hashedPassword,
+      }).save();
+      console.log(user);
+      req.session.userId = user.id;
     } catch (error) {
       if (error.code === "23505") {
         //duplicate username error
@@ -178,6 +181,7 @@ export class UserResolver {
         };
       }
     }
+
     return {
       user,
     };
@@ -188,13 +192,12 @@ export class UserResolver {
   async login(
     @Arg("usernameOrEmail") usernameOrEmail: string,
     @Arg("password") password: string,
-    @Ctx() { em, req }: MyContext
+    @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
-    const user = await em.findOne(
-      User,
+    const user = await User.findOne(
       usernameOrEmail.includes("@")
-        ? { email: usernameOrEmail }
-        : { username: usernameOrEmail }
+        ? { where: { email: usernameOrEmail } }
+        : { where: { username: usernameOrEmail } }
     );
 
     if (!user) {
