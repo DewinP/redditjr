@@ -14,10 +14,6 @@ const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
 const Post_1 = require("./Post");
 let User = class User extends typeorm_1.BaseEntity {
-    constructor() {
-        super(...arguments);
-        this.updatedAt = Date;
-    }
 };
 __decorate([
     type_graphql_1.Field(),
@@ -39,6 +35,13 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
+    type_graphql_1.Field(),
+    typeorm_1.Column({
+        default: "https://www.flaticon.com/svg/static/icons/svg/3440/3440465.svg",
+    }),
+    __metadata("design:type", String)
+], User.prototype, "avatar", void 0);
+__decorate([
     typeorm_1.OneToMany(() => Post_1.Post, (post) => post.creator),
     __metadata("design:type", Array)
 ], User.prototype, "posts", void 0);
@@ -50,7 +53,7 @@ __decorate([
 __decorate([
     type_graphql_1.Field(() => String),
     typeorm_1.UpdateDateColumn(),
-    __metadata("design:type", Object)
+    __metadata("design:type", Date)
 ], User.prototype, "updatedAt", void 0);
 User = __decorate([
     type_graphql_1.ObjectType(),

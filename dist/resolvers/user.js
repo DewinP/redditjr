@@ -46,6 +46,10 @@ __decorate([
     type_graphql_1.Field(),
     __metadata("design:type", String)
 ], UsernamePasswordInput.prototype, "password", void 0);
+__decorate([
+    type_graphql_1.Field(),
+    __metadata("design:type", String)
+], UsernamePasswordInput.prototype, "avatar", void 0);
 UsernamePasswordInput = __decorate([
     type_graphql_1.InputType()
 ], UsernamePasswordInput);
@@ -147,10 +151,12 @@ let UserResolver = class UserResolver {
             const hashedPassword = yield argon2_1.default.hash(options.password);
             let user;
             try {
+                console.log(options.avatar);
                 user = yield user_1.User.create({
                     username: options.username,
                     email: options.email,
                     password: hashedPassword,
+                    avatar: options.avatar,
                 }).save();
                 console.log(user);
                 req.session.userId = user.id;

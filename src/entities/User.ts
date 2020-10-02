@@ -28,6 +28,12 @@ export class User extends BaseEntity {
   @Column()
   password!: string;
 
+  @Field()
+  @Column({
+    default: "https://www.flaticon.com/svg/static/icons/svg/3440/3440465.svg",
+  })
+  avatar!: string;
+
   @OneToMany(() => Post, (post) => post.creator)
   posts: Post[];
 

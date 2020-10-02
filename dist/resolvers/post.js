@@ -45,9 +45,9 @@ let PostResolver = class PostResolver {
     post(id) {
         return Post_1.Post.findOne(id);
     }
-    cratePost(options, { req }) {
+    createPost(options, { req }) {
         return __awaiter(this, void 0, void 0, function* () {
-            return Post_1.Post.create(Object.assign(Object.assign({}, options), { creatorId: req.session.userId }));
+            return Post_1.Post.create(Object.assign(Object.assign({}, options), { creatorId: req.session.userId })).save();
         });
     }
     updatePost(id, title) {
@@ -90,7 +90,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [PostInput, Object]),
     __metadata("design:returntype", Promise)
-], PostResolver.prototype, "cratePost", null);
+], PostResolver.prototype, "createPost", null);
 __decorate([
     type_graphql_1.Mutation(() => Post_1.Post),
     __param(0, type_graphql_1.Arg("id")),

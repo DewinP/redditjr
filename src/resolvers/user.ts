@@ -9,7 +9,6 @@ import {
   Query,
   Resolver,
 } from "type-graphql";
-
 import argon2 from "argon2";
 import { validateRegister } from "../utils/validateRegister";
 import { COOKIE_NAME, FORGOT_PASSOWORD_PREFIX } from "../constants";
@@ -27,6 +26,9 @@ class UsernamePasswordInput {
 
   @Field()
   password: string;
+
+  @Field()
+  avatar: string;
 }
 
 @ObjectType()
@@ -161,10 +163,12 @@ export class UserResolver {
     const hashedPassword = await argon2.hash(options.password);
     let user;
     try {
+      console.log(options.avatar);
       user = await User.create({
         username: options.username,
         email: options.email,
         password: hashedPassword,
+        avatar: options.avatar,
       }).save();
       console.log(user);
       req.session.userId = user.id;

@@ -34,11 +34,11 @@ export class PostResolver {
 
   @Mutation(() => Post)
   @UseMiddleware(isAuth)
-  async cratePost(
+  async createPost(
     @Arg("options") options: PostInput,
     @Ctx() { req }: MyContext
   ): Promise<Post | null> {
-    return Post.create({ ...options, creatorId: req.session.userId });
+    return Post.create({ ...options, creatorId: req.session.userId }).save();
   }
 
   @Mutation(() => Post)
