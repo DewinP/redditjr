@@ -41,7 +41,8 @@ __decorate([
     __metadata("design:type", Number)
 ], Post.prototype, "creatorId", void 0);
 __decorate([
-    typeorm_1.ManyToOne(() => user_1.User, (user) => user.posts),
+    type_graphql_1.Field(),
+    typeorm_1.ManyToOne(() => user_1.User, (user) => user.posts, { eager: true }),
     __metadata("design:type", user_1.User)
 ], Post.prototype, "creator", void 0);
 __decorate([
