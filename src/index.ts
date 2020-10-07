@@ -21,7 +21,6 @@ const main = async () => {
     database: "wabbit",
     username: "postgres",
     password: "postgres",
-    logging: true,
     synchronize: true,
     entities: [Post, User, Comment],
   });
