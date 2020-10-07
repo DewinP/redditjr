@@ -7,23 +7,16 @@ import {
   UpdateDateColumn,
   BaseEntity,
   ManyToOne,
-  OneToMany,
 } from "typeorm";
+import { Post } from "./Post";
 import { User } from "./user";
-import { Comment } from "./Comment";
-import { Length } from "class-validator";
 
 @ObjectType()
 @Entity()
-export class Post extends BaseEntity {
+export class Comment extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
   id!: number;
-
-  @Field()
-  @Length(5, 75)
-  @Column()
-  title!: string;
 
   @Field()
   @Column()
@@ -33,16 +26,25 @@ export class Post extends BaseEntity {
   @Column({ type: "int", default: 0 })
   votes!: number;
 
-  @OneToMany(() => Comment, (comment) => comment.post, { eager: true })
-  comments: Comment[];
+  @Field()
+  @Column()
+  postId!: number;
+
+  @Field(() => Post)
+  @ManyToOne(() => Post, (post) => post.comments)
+  post: Post;
 
   @Field()
   @Column()
   creatorId!: number;
 
-  @Field()
-  @ManyToOne(() => User, (user) => user.posts, { eager: true })
+  @Field(() => User)
+  @ManyToOne(() => User, (user) => user.comments, { eager: true })
   creator: User;
+
+  @Field()
+  @Column({ default: false })
+  wasUpdated!: Boolean;
 
   @Field(() => String)
   @CreateDateColumn()

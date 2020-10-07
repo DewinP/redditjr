@@ -14,7 +14,7 @@ import { validateRegister } from "../utils/validateRegister";
 import { COOKIE_NAME, FORGOT_PASSOWORD_PREFIX } from "../constants";
 import { sendEmail } from "../utils/sendEmail";
 import { v4 } from "uuid";
-import { MyContext } from "src/types";
+import { MyContext } from "../types";
 
 @InputType()
 class UsernamePasswordInput {

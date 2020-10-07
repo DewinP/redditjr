@@ -3,7 +3,6 @@ import express from "express";
 import { COOKIE_NAME, __PROD__ } from "./constants";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
-import { HelloResolver } from "./resolvers/hello";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
 import connectRedis from "connect-redis";
@@ -13,6 +12,8 @@ import session from "express-session";
 import { createConnection } from "typeorm";
 import { Post } from "./entities/Post";
 import { User } from "./entities/user";
+import { Comment } from "./entities/Comment";
+import { CommentResolver } from "./resolvers/comment";
 
 const main = async () => {
   const conn = await createConnection({
@@ -22,7 +23,7 @@ const main = async () => {
     password: "postgres",
     logging: true,
     synchronize: true,
-    entities: [Post, User],
+    entities: [Post, User, Comment],
   });
 
   const app = express();
@@ -57,7 +58,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver, PostResolver, UserResolver],
+      resolvers: [CommentResolver, PostResolver, UserResolver],
       validate: false,
     }),
     context: ({ req, res }) => ({ req, res, redis }),

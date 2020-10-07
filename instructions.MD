@@ -1,8 +1,0 @@
--- Install @types/node typescript
---create start,watch and dev script
--- add nodemon
--- Set up mikro-Orm
--- set up server
--- install @types/express
--- set up connect-redis express-sessions
--- install types for both

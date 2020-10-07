@@ -9,60 +9,66 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
+exports.Comment = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
-const Comment_1 = require("./Comment");
 const Post_1 = require("./Post");
-let User = class User extends typeorm_1.BaseEntity {
+const user_1 = require("./user");
+let Comment = class Comment extends typeorm_1.BaseEntity {
 };
 __decorate([
     type_graphql_1.Field(),
     typeorm_1.PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
-], User.prototype, "id", void 0);
+], Comment.prototype, "id", void 0);
 __decorate([
     type_graphql_1.Field(),
-    typeorm_1.Column({ unique: true }),
-    __metadata("design:type", String)
-], User.prototype, "username", void 0);
-__decorate([
-    type_graphql_1.Field(),
-    typeorm_1.Column({ unique: true }),
-    __metadata("design:type", String)
-], User.prototype, "email", void 0);
-__decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
-], User.prototype, "password", void 0);
+], Comment.prototype, "body", void 0);
 __decorate([
     type_graphql_1.Field(),
-    typeorm_1.Column({
-        default: "https://www.flaticon.com/svg/static/icons/svg/3440/3440465.svg",
-    }),
-    __metadata("design:type", String)
-], User.prototype, "avatar", void 0);
+    typeorm_1.Column({ type: "int", default: 0 }),
+    __metadata("design:type", Number)
+], Comment.prototype, "votes", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => Post_1.Post, (post) => post.creator),
-    __metadata("design:type", Array)
-], User.prototype, "posts", void 0);
+    type_graphql_1.Field(),
+    typeorm_1.Column(),
+    __metadata("design:type", Number)
+], Comment.prototype, "postId", void 0);
 __decorate([
-    typeorm_1.OneToMany(() => Comment_1.Comment, (comment) => comment.creator),
-    __metadata("design:type", Array)
-], User.prototype, "comments", void 0);
+    type_graphql_1.Field(() => Post_1.Post),
+    typeorm_1.ManyToOne(() => Post_1.Post, (post) => post.comments),
+    __metadata("design:type", Post_1.Post)
+], Comment.prototype, "post", void 0);
+__decorate([
+    type_graphql_1.Field(),
+    typeorm_1.Column(),
+    __metadata("design:type", Number)
+], Comment.prototype, "creatorId", void 0);
+__decorate([
+    type_graphql_1.Field(() => user_1.User),
+    typeorm_1.ManyToOne(() => user_1.User, (user) => user.comments, { eager: true }),
+    __metadata("design:type", user_1.User)
+], Comment.prototype, "creator", void 0);
+__decorate([
+    type_graphql_1.Field(),
+    typeorm_1.Column({ default: false }),
+    __metadata("design:type", Boolean)
+], Comment.prototype, "wasUpdated", void 0);
 __decorate([
     type_graphql_1.Field(() => String),
     typeorm_1.CreateDateColumn(),
     __metadata("design:type", Date)
-], User.prototype, "createdAt", void 0);
+], Comment.prototype, "createdAt", void 0);
 __decorate([
     type_graphql_1.Field(() => String),
     typeorm_1.UpdateDateColumn(),
     __metadata("design:type", Date)
-], User.prototype, "updatedAt", void 0);
-User = __decorate([
+], Comment.prototype, "updatedAt", void 0);
+Comment = __decorate([
     type_graphql_1.ObjectType(),
     typeorm_1.Entity()
-], User);
-exports.User = User;
-//# sourceMappingURL=user.js.map
+], Comment);
+exports.Comment = Comment;
+//# sourceMappingURL=Comment.js.map

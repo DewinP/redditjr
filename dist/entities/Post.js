@@ -13,6 +13,8 @@ exports.Post = void 0;
 const type_graphql_1 = require("type-graphql");
 const typeorm_1 = require("typeorm");
 const user_1 = require("./user");
+const Comment_1 = require("./Comment");
+const class_validator_1 = require("class-validator");
 let Post = class Post extends typeorm_1.BaseEntity {
 };
 __decorate([
@@ -22,6 +24,7 @@ __decorate([
 ], Post.prototype, "id", void 0);
 __decorate([
     type_graphql_1.Field(),
+    class_validator_1.Length(5, 75),
     typeorm_1.Column(),
     __metadata("design:type", String)
 ], Post.prototype, "title", void 0);
@@ -35,6 +38,10 @@ __decorate([
     typeorm_1.Column({ type: "int", default: 0 }),
     __metadata("design:type", Number)
 ], Post.prototype, "votes", void 0);
+__decorate([
+    typeorm_1.OneToMany(() => Comment_1.Comment, (comment) => comment.post, { eager: true }),
+    __metadata("design:type", Array)
+], Post.prototype, "comments", void 0);
 __decorate([
     type_graphql_1.Field(),
     typeorm_1.Column(),

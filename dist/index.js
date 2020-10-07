@@ -17,7 +17,6 @@ const express_1 = __importDefault(require("express"));
 const constants_1 = require("./constants");
 const apollo_server_express_1 = require("apollo-server-express");
 const type_graphql_1 = require("type-graphql");
-const hello_1 = require("./resolvers/hello");
 const post_1 = require("./resolvers/post");
 const user_1 = require("./resolvers/user");
 const connect_redis_1 = __importDefault(require("connect-redis"));
@@ -27,6 +26,8 @@ const express_session_1 = __importDefault(require("express-session"));
 const typeorm_1 = require("typeorm");
 const Post_1 = require("./entities/Post");
 const user_2 = require("./entities/user");
+const Comment_1 = require("./entities/Comment");
+const comment_1 = require("./resolvers/comment");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const conn = yield typeorm_1.createConnection({
         type: "postgres",
@@ -35,7 +36,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         password: "postgres",
         logging: true,
         synchronize: true,
-        entities: [Post_1.Post, user_2.User],
+        entities: [Post_1.Post, user_2.User, Comment_1.Comment],
     });
     const app = express_1.default();
     const RedisStore = connect_redis_1.default(express_session_1.default);
@@ -62,7 +63,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     }));
     const apolloServer = new apollo_server_express_1.ApolloServer({
         schema: yield type_graphql_1.buildSchema({
-            resolvers: [hello_1.HelloResolver, post_1.PostResolver, user_1.UserResolver],
+            resolvers: [comment_1.CommentResolver, post_1.PostResolver, user_1.UserResolver],
             validate: false,
         }),
         context: ({ req, res }) => ({ req, res, redis }),
